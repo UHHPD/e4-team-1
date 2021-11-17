@@ -1,5 +1,5 @@
 #include "Data.hh"
-
+#include<cmath>
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -31,11 +31,26 @@ Data::Data(const std::string& filename) {
     file >> entries;
     m_data.push_back(entries);
   }
-
+  for (int i = 0; i < size; ++i) {
+    double uncertainties;
+    file >> uncertainties;
+    m_uncertainty.push_back(uncertainties);
+  }
+  
   // done! close the file
   file.close();
 
   assertSizes();
 };
-
+int Data::checkCompatibility(const Data& in, int n){
+  int k=0;
+    for(int l=0;l<=56;l++){
+    double deltay=abs(in.measurement(l)-measurement(l));
+    //std::cout<<deltay<<endl;
+    double sigmay=sqrt(pow(in.error(l),2)-pow(error(l),2));
+  if (deltay>n*sigmay){k++;}
+  }
+return k;
+}
 void Data::assertSizes() { assert(m_data.size() + 1 == m_bins.size()); }
+
